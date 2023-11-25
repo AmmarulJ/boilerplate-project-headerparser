@@ -5,6 +5,7 @@
 require('dotenv').config();
 var express = require('express');
 var app = express();
+let bodyParser = require('body-parser');
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC
@@ -13,6 +14,9 @@ app.use(cors({ optionsSuccessStatus: 200 })); // some legacy browsers choke on 2
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
+
+app.use(bodyParser.urlencoded({ extended: false}));
+app.use(bodyParser.json());
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get('/', function (req, res) {
@@ -23,6 +27,20 @@ app.get('/', function (req, res) {
 app.get('/api/hello', function (req, res) {
   res.json({ greeting: 'hello API' });
 });
+
+app.get('/api/whoami', function(req, res){
+  let ipadress, language, software;
+
+  ipadress = req.headers['x-forwarded-for'];
+  language = req.headers["accept-language"];
+  software = req.headers["user-agent"];
+
+  return res.json({
+    ipadress,
+    language,
+    software
+  })
+})
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT || 3000, function () {
